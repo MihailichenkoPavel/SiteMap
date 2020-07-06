@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteMap.Web", "SiteMap\SiteMap.Web.csproj", "{959EE554-B23C-4FBD-9BAB-A40577D9529C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteMap.DAL", "SiteMap.DAL\SiteMap.DAL.csproj", "{7BE95167-651A-4AC4-BB88-BCFEA7568A65}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{959EE554-B23C-4FBD-9BAB-A40577D9529C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{959EE554-B23C-4FBD-9BAB-A40577D9529C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{959EE554-B23C-4FBD-9BAB-A40577D9529C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{959EE554-B23C-4FBD-9BAB-A40577D9529C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BE95167-651A-4AC4-BB88-BCFEA7568A65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BE95167-651A-4AC4-BB88-BCFEA7568A65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BE95167-651A-4AC4-BB88-BCFEA7568A65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BE95167-651A-4AC4-BB88-BCFEA7568A65}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {91796D0A-5D51-4772-9D27-534CCC56E8A3}
+	EndGlobalSection
+EndGlobal

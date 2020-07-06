@@ -1,0 +1,6 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index"; }
+
+@using (Html.BeginForm("CreateSitemap", "Home", FormMethod.Post, new { @class = "jumbotron d-flex align-items-center min-vh-100" }))
+{
+<input id="url" class="urlInput form-control container text-center" type="text" placeholder="Please, enter website url" name="url" />}

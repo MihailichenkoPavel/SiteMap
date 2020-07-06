@@ -1,0 +1,28 @@
+﻿@using PagedList.Mvc;
+@model PagedList.StaticPagedList<global::SiteMap.DAL.Entity.Sitemap>
+
+@{ ViewBag.Title = "History"; }
+
+<h2>@ViewBag.Title</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Site Name</th>
+            <th scope="col">Last Request Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sitemap in Model)
+        {
+<tr>
+    <th scope="row">
+        @Html.ActionLink(sitemap.HttpAddress, "Sitemap", new { url = sitemap.HttpAddress })
+    </th>
+    <td>@sitemap.LastRequest</td>
+</tr>
+}
+    </tbody>
+</table>
+
+@Html.PagedListPager(Model, page => Url.Action("History", new { page }))

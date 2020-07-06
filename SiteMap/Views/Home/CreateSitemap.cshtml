@@ -1,0 +1,80 @@
+﻿@model IEnumerable<global::SiteMap.DAL.Entity.SitemapLink>
+
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<h2>Page Speed</h2>
+
+<canvas id="myChart"></canvas>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Site Name</th>
+            <th scope="col">Shortest Time</th>
+            <th scope="col">Longest Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var url in Model)
+        {
+            <tr>
+                <th scope="row">
+                    @url.HttpAddress
+                </th>
+                <td>
+                    @url.ShortestTime
+                </td>
+                <td>
+                    @url.LongestTime
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    var ctx = document.getElementById("myChart");
+
+    Chart.defaults.global.defaultFontFamily = "Lato";
+    Chart.defaults.global.defaultFontSize = 14;
+
+    var shortestTimeData = {
+        label: 'Shortest Time',
+        data: [@ViewBag.ShortestTime_List],
+        backgroundColor: 'rgba(12, 135, 16, 1)',
+        borderWidth: 0,
+        yAxisID: "y-axis-density"
+    };
+
+    var longestTimeData = {
+        label: 'Longest Time',
+        data: [@ViewBag.LongestTime_List],
+        backgroundColor: 'rgba(166, 12, 24, 1)',
+        borderWidth: 0,
+        yAxisID: "y-axis-gravity"
+    };
+
+    var pageSpeedData = {
+        labels: [@Html.Raw(ViewBag.LinkName_List)],
+        datasets: [shortestTimeData, longestTimeData]
+    };
+
+    var chartOptions = {
+        scales: {
+            xAxes: [{
+                barPercentage: 1,
+                categoryPercentage: 0.3
+            }],
+            yAxes: [{
+                id: "y-axis-density"
+            }, {
+                id: "y-axis-gravity"
+            }]
+        }
+    };
+
+    var barChart = new Chart(ctx, {
+        type: 'bar',
+        data: pageSpeedData,
+        options: chartOptions
+    });
+</script>
