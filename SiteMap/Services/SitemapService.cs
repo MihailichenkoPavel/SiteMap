@@ -28,5 +28,29 @@ namespace SiteMap.Services
             var sitemap = _repository.GetSitemap(url);
             return sitemap.Links;
 		}
+
+        public List<string> GetParseLinks(IEnumerable<string> urls, string url)
+        {
+            var links = new List<string>();
+			foreach (var u in urls)
+			{
+                string link = u.ToString();
+                if (string.IsNullOrWhiteSpace(link))
+					continue;
+
+				if (!link.StartsWith("http") && !link.StartsWith("www") && !link.StartsWith(url))
+				{
+					if (link.EndsWith("/"))
+						link = url + link;
+				}
+
+				if (link.StartsWith(url) && !links.Contains(link))
+				{
+					links.Add(link);
+				}
+			}
+
+			return links;
+		}
     }
 }

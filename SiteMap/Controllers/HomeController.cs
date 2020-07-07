@@ -47,30 +47,25 @@ namespace SiteMap.Controllers
 			return View("CreateSitemap", sitemapLinks.OrderByDescending(u => u.LongestTime).ToList());
 		}
 
-        public async Task<ActionResult> CreateSitemap(string url)
-        {
+		public async Task<ActionResult> CreateSitemap(string url)
+		{
 			var entireWatch = Stopwatch.StartNew();
-
 			string content = await _client.GetStringAsync(url);
-
 			var urls = _urlRegex.Matches(content).Cast<Match>().Select(m => m.Value);
-
-			urls = urls.Where(m => m.StartsWith("http")).Distinct();
+			var links = _sitemapService.GetParseLinks(urls, url);
 			var sitemap = _repository.AddSitemap(url);
-
 			var sitemapLinks = new List<SitemapLink>();
-
 			var tasks = new List<Task>();
-			foreach (var u in urls)
+			foreach (var link in links)
 			{
 				var task = new Task(() =>
 				{
                     var info = new SitemapLink
                     {
-                        HttpAddress = u
+                        HttpAddress = link
                     };
                     var watch = Stopwatch.StartNew();
-					var result = _client.GetAsync(u).Result;
+					var result = _client.GetAsync(link).Result;
 					watch.Stop();
 					info.ShortestTime = watch.ElapsedMilliseconds;
 					info.LongestTime = watch.ElapsedMilliseconds;
@@ -81,9 +76,7 @@ namespace SiteMap.Controllers
 				task.Start();
 				task.Wait();
 			}
-
 			entireWatch.Stop();
-
 			_repository.AddSitemapLinks(sitemap.Id, sitemapLinks);
 
 			ViewBag.LinkName_List = string.Join(",", sitemapLinks.Select(c => string.Format("'{0}'", c.HttpAddress)).ToList());
@@ -92,5 +85,5 @@ namespace SiteMap.Controllers
 
 			return View(sitemapLinks.OrderByDescending(u => u.LongestTime).ToList());
         }
-    }
+	}
 }

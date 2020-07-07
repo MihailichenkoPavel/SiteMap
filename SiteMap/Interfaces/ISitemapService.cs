@@ -8,5 +8,6 @@ namespace SiteMap.Interfaces
     {
         StaticPagedList<Sitemap> GetHistory(int page);
         List<SitemapLink> GetSitemapLink(string url);
+        List<string> GetParseLinks(IEnumerable<string> urls, string url);
     }
 }
