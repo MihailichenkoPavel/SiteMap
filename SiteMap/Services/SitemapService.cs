@@ -3,7 +3,10 @@ using SiteMap.DAL.Entity;
 using SiteMap.DAL.Interfaces;
 using SiteMap.DAL.Repositories;
 using SiteMap.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Xml;
 
 namespace SiteMap.Services
 {
@@ -29,28 +32,105 @@ namespace SiteMap.Services
             return sitemap.Links;
 		}
 
-        public List<string> GetParseLinks(IEnumerable<string> urls, string url)
+        private string CheckUrl(string url)
         {
-            var links = new List<string>();
-			foreach (var u in urls)
-			{
-                string link = u.ToString();
-                if (string.IsNullOrWhiteSpace(link))
-					continue;
+            if (url.EndsWith("/"))
+                url = url.Remove(url.Length - 1);
+            if (url.Contains("https://"))
+            {
+                if (url.Contains(@"/sitemap.xml") == false)
+                {
+                    url += "/sitemap.xml";
+                }
+                else if (url.Contains("sitemap.xml") == false)
+                {
+                    url += "sitemap.xml";
+                }
+            }
+            else if (url.Contains("http://"))
+            {
+                if (url.Contains(@"/sitemap.xml") == false)
+                {
+                    url += "/sitemap.xml";
+                }
+                else if (url.Contains("sitemap.xml") == false)
+                {
+                    url += "sitemap.xml";
+                }
+            }
+            else if (url.Contains("https://") == false)
+            {
+                if (url.Contains(@"/sitemap.xml") == false)
+                {
+                    url = url.Insert(0, @"https://");
+                    url += "/sitemap.xml";
+                }
+                else if (url.Contains("sitemap.xml") == false)
+                {
+                    url = url.Insert(0, @"http://");
+                    url += "sitemap.xml";
+                }
+            }
+            else if (url.Contains("http://") == false)
+            {
+                if (url.Contains(@"/sitemap.xml") == false)
+                {
+                    url = url.Insert(0, @"https://");
+                    url += "/sitemap.xml";
+                }
+                else if (url.Contains("sitemap.xml") == false)
+                {
+                    url = url.Insert(0, @"http://");
+                    url += "sitemap.xml";
+                }
+            }
+            return url;
+        }
 
-				if (!link.StartsWith("http") && !link.StartsWith("www") && !link.StartsWith(url))
-				{
-					if (link.EndsWith("/"))
-						link = url + link;
-				}
+        private void CheckRobotsTxt(string url)
+        {
+            url = url.Remove(url.IndexOf("sitemap.xml"));
+            url += "robots.txt";
+            WebClient web = new WebClient();
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            string text = web.DownloadString(url);
+            string[] arrText = text.Split('\n');
+            foreach (string n in arrText)
+            {
+                if (n.Contains("Sitemap: "))
+                {
+                    url = n.Remove(0, 9);
+                }
+            }
+        }
 
-				if (link.StartsWith(url) && !links.Contains(link))
-				{
-					links.Add(link);
-				}
-			}
-
-			return links;
-		}
+        public List<string> ParseXml(string url)
+        {
+            var correctUrl = CheckUrl(url);
+            var parsedUrl = new List<string>();
+            XmlDocument obj = new XmlDocument();
+            try
+            {
+                obj.Load(correctUrl);
+            }
+            catch
+            {
+                try
+                {
+                    CheckRobotsTxt(correctUrl);
+                    obj.Load(correctUrl);
+                }
+                catch (Exception ex)
+                {
+                    var exception = ex.Message;
+                }
+            }
+            XmlNodeList elemList = obj.GetElementsByTagName("loc");
+            for (int i = 0; i < elemList.Count; i++)
+            {
+                parsedUrl.Add(elemList[i].InnerXml);
+            }
+            return parsedUrl;
+        }
     }
 }

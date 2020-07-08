@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -16,10 +15,8 @@ namespace SiteMap.Controllers
     public class HomeController : Controller
     {
 		private readonly ISitemapService _sitemapService;
-
 		private readonly HttpClient _client;
 		private readonly IRepository _repository;
-		private readonly Regex _urlRegex = new Regex("(?<=(<a.+?href=\")).+?(?=\")");
 
 		public HomeController()
         {
@@ -50,9 +47,7 @@ namespace SiteMap.Controllers
 		public async Task<ActionResult> CreateSitemap(string url)
 		{
 			var entireWatch = Stopwatch.StartNew();
-			string content = await _client.GetStringAsync(url);
-			var urls = _urlRegex.Matches(content).Cast<Match>().Select(m => m.Value);
-			var links = _sitemapService.GetParseLinks(urls, url);
+			var links = _sitemapService.ParseXml(url);
 			var sitemap = _repository.AddSitemap(url);
 			var sitemapLinks = new List<SitemapLink>();
 			var tasks = new List<Task>();
