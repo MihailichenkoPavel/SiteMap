@@ -1,10 +1,12 @@
-﻿using PagedList;
+﻿using HtmlAgilityPack;
+using PagedList;
 using SiteMap.DAL.Entity;
 using SiteMap.DAL.Interfaces;
 using SiteMap.DAL.Repositories;
 using SiteMap.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Xml;
 
@@ -12,12 +14,12 @@ namespace SiteMap.Services
 {
     public class SitemapService : ISitemapService
     {
-		private readonly IRepository _repository;
-		private const int _pageSize = 10;
+        private readonly IRepository _repository;
+        private const int _pageSize = 10;
 
         public SitemapService()
         {
-			_repository = new Repository();
+            _repository = new Repository();
         }
 
         public StaticPagedList<Sitemap> GetHistory(int page)
@@ -30,7 +32,22 @@ namespace SiteMap.Services
         {
             var sitemap = _repository.GetSitemap(url);
             return sitemap.Links;
-		}
+        }
+
+        public List<string> GetLinks(string url)
+        {
+            var links = new List<string>();
+            var parseXml = ParseXml(url);
+            if (parseXml.Count > 0)
+            {
+                links = parseXml;
+            }
+            else
+            {
+                links = ParseHtml(url);
+            }
+            return links;
+        }
 
         private string CheckUrl(string url)
         {
@@ -104,7 +121,7 @@ namespace SiteMap.Services
             }
         }
 
-        public List<string> ParseXml(string url)
+        private List<string> ParseXml(string url)
         {
             var correctUrl = CheckUrl(url);
             var parsedUrl = new List<string>();
@@ -131,6 +148,37 @@ namespace SiteMap.Services
                 parsedUrl.Add(elemList[i].InnerXml);
             }
             return parsedUrl;
+        }
+
+        private List<string> ParseHtml(string url)
+        {
+            var parseHtml = new List<string>();
+            UriBuilder uriBuilder = new UriBuilder(url);
+            var inputUri = new Uri($"{uriBuilder.Scheme}://{uriBuilder.Host}");
+            HtmlWeb hw = new HtmlWeb();
+            HtmlDocument doc = hw.Load(url);
+            List<HtmlNode> nodesLinks = doc.DocumentNode.SelectNodes("//a[@href]")?.ToList();
+
+            foreach (HtmlNode nodeLink in nodesLinks)
+            {
+                string link = nodeLink.Attributes["href"].Value;
+
+                if (!Uri.IsWellFormedUriString(link, UriKind.Absolute))
+                {
+                    UriBuilder builder = new UriBuilder
+                    {
+                        Scheme = inputUri.Scheme,
+                        Host = inputUri.Host,
+                        Path = link
+                    };
+                    link = builder.Uri.AbsoluteUri;
+                }
+                if (Uri.IsWellFormedUriString(link, UriKind.Absolute))
+                {
+                    parseHtml.Add(link);
+                }
+            }
+            return parseHtml;
         }
     }
 }

@@ -47,7 +47,7 @@ namespace SiteMap.Controllers
 		public async Task<ActionResult> CreateSitemap(string url)
 		{
 			var entireWatch = Stopwatch.StartNew();
-			var links = _sitemapService.ParseXml(url);
+			var links = _sitemapService.GetLinks(url);
 			var sitemap = _repository.AddSitemap(url);
 			var sitemapLinks = new List<SitemapLink>();
 			var tasks = new List<Task>();
