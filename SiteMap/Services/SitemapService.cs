@@ -156,7 +156,7 @@ namespace SiteMap.Services
             UriBuilder uriBuilder = new UriBuilder(url);
             var inputUri = new Uri($"{uriBuilder.Scheme}://{uriBuilder.Host}");
             HtmlWeb hw = new HtmlWeb();
-            HtmlDocument doc = hw.Load(url);
+            HtmlDocument doc = hw.Load(inputUri);
             List<HtmlNode> nodesLinks = doc.DocumentNode.SelectNodes("//a[@href]")?.ToList();
 
             foreach (HtmlNode nodeLink in nodesLinks)
